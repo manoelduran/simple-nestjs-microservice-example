@@ -24,7 +24,7 @@ A comunicação entre os serviços é feita de forma assíncrona através do **R
 Para rodar este projeto, você precisará ter os seguintes softwares instalados na sua máquina:
 
 - [**Docker**](https://www.docker.com/get-started/) e **Docker Compose**
-- [**Node.js**](https://nodejs.org/) (v18 ou superior)
+- [**Node.js**](https://nodejs.org/) (v22 ou superior)
 - **NPM** (geralmente instalado com o Node.js)
 
 ---
