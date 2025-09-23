@@ -1,0 +1,82 @@
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile
+    hostname: api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-gateway:
+        condition: service_healthy
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      DATABASE_URL: postgresql://admin:admin@postgres-gateway:5432/gateway_db
+
+  notification-consumer:
+    build:
+      context: .
+      dockerfile: apps/notification-consumer/Dockerfile
+    hostname: notification-consumer
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres-consumer:
+        condition: service_healthy
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      DATABASE_URL: postgresql://admin:admin@postgres-consumer:5432/consumer_db
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    hostname: rabbitmq
+    ports:
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-gateway:
+    image: postgres:15-alpine
+    hostname: postgres-gateway
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: gateway_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_gateway_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d gateway_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-consumer:
+    image: postgres:15-alpine
+    hostname: postgres-consumer
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: consumer_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_consumer_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d consumer_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_gateway_data:
+  postgres_consumer_data:

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/simple-nestjs-microservice-example/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/simple-nestjs-microservice-example/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/simple-nestjs-microservice-example",
+  "projects": {
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "notification-consumer": {
+      "type": "application",
+      "root": "apps/notification-consumer",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification-consumer/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification-consumer/tsconfig.app.json"
+      }
+    },
+    "shared": {
+      "type": "library",
+      "root": "libs/shared",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
+      }
+    }
+  }
+}
