@@ -5,7 +5,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { ApiGatewayModule } from '../src/api-gateway.module';
-import { INotificationRepository, NOTIFICATION_REPOSITORY } from '@app/shared';
+import {
+  INotificationRepository,
+  NOTIFICATION_REPOSITORY,
+  SharedModule,
+} from '@app/shared';
+import { ClientProxy } from '@nestjs/microservices';
 
 describe('AppController (E2E)', () => {
   let app: INestApplication;
@@ -13,7 +18,7 @@ describe('AppController (E2E)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [ApiGatewayModule],
+      imports: [ApiGatewayModule, SharedModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -23,13 +28,16 @@ describe('AppController (E2E)', () => {
     );
 
     await app.init();
-
+    const client = app.get<ClientProxy>('NOTIFICATION_RABBITMQ_CLIENT');
+    await client.connect();
     repository = moduleFixture.get<INotificationRepository>(
       NOTIFICATION_REPOSITORY,
     );
-  });
+  }, 30000);
 
   afterAll(async () => {
+    const client = app.get<ClientProxy>('NOTIFICATION_RABBITMQ_CLIENT');
+    await client.close();
     await app.close();
   });
 

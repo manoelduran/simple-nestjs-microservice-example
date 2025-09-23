@@ -34,6 +34,7 @@ services:
     image: rabbitmq:3-management-alpine
     hostname: rabbitmq
     ports:
+      - "5672:5672"
       - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
