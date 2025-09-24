@@ -9,13 +9,13 @@ import { RabbitMQService } from './infrastructure/adapter/rabbitmq.service';
     CqrsModule,
     ClientsModule.register([
       {
-        name: 'NOTIFICATION_RABBITMQ_CLIENT',
+        name: 'NOTIFICATION_ENTRANCE_CLIENT',
         transport: Transport.RMQ,
         options: {
           urls: [
             process.env.RABBITMQ_URL || 'amqp://guest:guest@rabbitmq:5672',
           ],
-          queue: 'queue.notification.entrance.manoel',
+          queue: 'queue.notification.entrance',
           queueOptions: { durable: true },
           exchange: 'notifications_exchange',
           exchangeType: 'topic',
@@ -23,6 +23,25 @@ import { RabbitMQService } from './infrastructure/adapter/rabbitmq.service';
             {
               exchange: 'notifications_exchange',
               routingKey: 'notification_created',
+            },
+          ],
+        },
+      },
+      {
+        name: 'NOTIFICATION_STATUS_CLIENT',
+        transport: Transport.RMQ,
+        options: {
+          urls: [
+            process.env.RABBITMQ_URL || 'amqp://guest:guest@rabbitmq:5672',
+          ],
+          queue: 'queue.notification.status',
+          queueOptions: { durable: true },
+          exchange: 'notifications_exchange',
+          exchangeType: 'topic',
+          queueBindings: [
+            {
+              exchange: 'notifications_exchange',
+              routingKey: 'notification_status_updated',
             },
           ],
         },

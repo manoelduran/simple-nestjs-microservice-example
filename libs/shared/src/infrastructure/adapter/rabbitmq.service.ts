@@ -6,8 +6,11 @@ import { Notification } from '../../domain/notification.entity';
 @Injectable()
 export class RabbitMQService implements IMessagePublisher {
   constructor(
-    @Inject('NOTIFICATION_RABBITMQ_CLIENT')
-    private readonly client: ClientProxy,
+    @Inject('NOTIFICATION_ENTRANCE_CLIENT')
+    private readonly entranceClient: ClientProxy,
+
+    @Inject('NOTIFICATION_STATUS_CLIENT')
+    private readonly statusClient: ClientProxy,
   ) {}
 
   publishNotificationForProcessing(notification: Notification): void {
@@ -15,8 +18,7 @@ export class RabbitMQService implements IMessagePublisher {
       messageID: notification.messageID,
       content: notification.content,
     };
-
-    this.client.emit('notification_created', payload);
+    this.entranceClient.emit('notification_created', payload);
   }
 
   publishNotificationStatus(notification: Notification): void {
@@ -24,6 +26,6 @@ export class RabbitMQService implements IMessagePublisher {
       messageID: notification.messageID,
       status: notification.status,
     };
-    this.client.emit('queue.notification.status.manoel', payload);
+    this.statusClient.emit('notification_status_updated', payload);
   }
 }

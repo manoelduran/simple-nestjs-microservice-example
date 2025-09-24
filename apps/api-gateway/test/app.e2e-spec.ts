@@ -28,7 +28,7 @@ describe('AppController (E2E)', () => {
     );
 
     await app.init();
-    const client = app.get<ClientProxy>('NOTIFICATION_RABBITMQ_CLIENT');
+    const client = app.get<ClientProxy>('NOTIFICATION_ENTRANCE_CLIENT');
     await client.connect();
     repository = moduleFixture.get<INotificationRepository>(
       NOTIFICATION_REPOSITORY,
@@ -36,7 +36,7 @@ describe('AppController (E2E)', () => {
   }, 30000);
 
   afterAll(async () => {
-    const client = app.get<ClientProxy>('NOTIFICATION_RABBITMQ_CLIENT');
+    const client = app.get<ClientProxy>('NOTIFICATION_ENTRANCE_CLIENT');
     await client.close();
     await app.close();
   });
@@ -64,5 +64,11 @@ describe('AppController (E2E)', () => {
     expect(savedNotification).not.toBeNull();
     expect(savedNotification!.messageID).toEqual(messageID);
     expect(savedNotification!.status).toEqual('Processing');
+
+    await new Promise((resolve) => setTimeout(resolve, 5000)); // delay de 5 segundos
+
+    const updatedNotification = await repository.findById(messageID);
+    expect(updatedNotification).toBeDefined();
+    expect(updatedNotification?.status).toMatch(/Success|Failure/);
   });
 });

@@ -8,7 +8,7 @@ import { NotificationConsumerModule } from './notification-consumer.module';
 import { INestApplicationContext } from '@nestjs/common';
 
 async function connectClient(app: INestApplicationContext): Promise<void> {
-  const client = app.get<ClientProxy>('NOTIFICATION_RABBITMQ_CLIENT');
+  const client = app.get<ClientProxy>('NOTIFICATION_STATUS_CLIENT');
   await client.connect();
   console.log('RMQ Client do Consumer está conectado');
 }
@@ -20,7 +20,8 @@ async function bootstrap() {
       transport: Transport.RMQ,
       options: {
         urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@rabbitmq:5672'],
-        queue: 'queue.notification.entrance.manoel',
+        queue: 'queue.notification.entrance',
+
         queueOptions: { durable: true },
         noAck: false,
         exchange: 'notifications_exchange',
